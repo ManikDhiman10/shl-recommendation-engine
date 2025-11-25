@@ -7,10 +7,9 @@ venv/
 submission.csv
 punkt_tab/
 playwright/
-*.pkl
+
 *.bin
 *.faiss
-*.index
 *.pt
 logs/
 *.log
