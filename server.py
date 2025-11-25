@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-backend.py:- FastAPI backend for SHL Assessment Recommendation
-#run command:- python backend.py
+server.py:- FastAPI backend for SHL Assessment Recommendation
+#run command:- python server.py
 """
 
 from fastapi import FastAPI, HTTPException
@@ -249,7 +249,7 @@ if __name__ == "__main__":
     print("❤️ Health: http://localhost:8000/health")
 
     uvicorn.run(
-        "backend:app",
+        "server:app",
         host="0.0.0.0",
         port=8000,
         reload=True,
