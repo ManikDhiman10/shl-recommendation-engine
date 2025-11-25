@@ -1,0 +1,18 @@
+# 1) Ensure .gitignore contains venv/ (create if needed)
+cat > .gitignore <<'EOF'
+__pycache__/
+*.pyc
+venv/
+.env
+submission.csv
+punkt_tab/
+playwright/
+*.pkl
+*.bin
+*.faiss
+*.index
+*.pt
+logs/
+*.log
+.DS_Store
+EOF

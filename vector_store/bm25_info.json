@@ -1,0 +1,4 @@
+{
+  "short_bm25_pickle": "vector_store/short_texts.bm25.pkl",
+  "chunk_bm25_pickle": "vector_store/chunks.bm25.pkl"
+}
