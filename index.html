@@ -1,476 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>SHL Assessment Recommender | AI-Powered Talent Assessment</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root{
+            --primary:#2563eb; --primary-dark:#1d4ed8; --secondary:#64748b;
+            --accent:#f59e0b; --light:#f8fafc; --dark:#1e293b;
+            --success:#10b981; --error:#ef4444; --border:#e2e8f0;
+            --shadow:0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+            --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
         }
-
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --accent: #f59e0b;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --success: #10b981;
-            --error: #ef4444;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        body{
+            font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height:1.6; color:var(--dark);
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            min-height:100vh;
         }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: var(--dark);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        .container{ max-width:1200px; margin:0 auto; padding:20px; }
+        .header{
+            background:rgba(255,255,255,.95); backdrop-filter:blur(10px);
+            border-radius:16px; padding:24px 32px; margin-bottom:30px;
+            box-shadow:var(--shadow); border:1px solid rgba(255,255,255,.2);
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        .logo-container{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+        .logo{ width:40px; height:40px; background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            border-radius:10px; display:flex; align-items:center; justify-content:center; color:white;
+            font-weight:bold; font-size:18px;
         }
-
-        /* Header Styles */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 24px 32px;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .logo-text{ font-size:24px; font-weight:700; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); -webkit-text-fill-color:transparent; }
+        .tagline{ color:var(--secondary); font-size:16px; margin-left:52px; }
+        .main-content{ display:grid; grid-template-columns:1fr 400px; gap:30px; align-items:start; }
+        .query-section{ background:white; border-radius:16px; padding:32px; box-shadow:var(--shadow-lg); margin-bottom:30px; }
+        .section-title{ font-size:20px; font-weight:600; margin-bottom:20px; color:var(--dark); display:flex; align-items:center; gap:10px; }
+        .query-input-container{ position:relative; margin-bottom:20px; }
+        .query-input{ width:100%; min-height:120px; padding:16px; border:2px solid var(--border); border-radius:12px; font-size:16px; resize:vertical; transition:all .3s; font-family:inherit; }
+        .query-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+        .query-input::placeholder{ color:var(--secondary); }
+        .char-count{ position:absolute; bottom:10px; right:10px; font-size:12px; color:var(--secondary); }
+        .examples-section{ margin-bottom:25px; }
+        .examples-title{ font-size:14px; font-weight:600; margin-bottom:12px; color:var(--secondary); text-transform:uppercase; letter-spacing:.5px; }
+        .example-chips{ display:flex; flex-wrap:wrap; gap:10px; }
+        .example-chip{ background:var(--light); border:1px solid var(--border); border-radius:20px; padding:8px 16px; font-size:14px; cursor:pointer; transition:all .2s; }
+        .example-chip:hover{ background:var(--primary); color:white; transform:translateY(-1px); }
+        .action-buttons{ display:flex; gap:12px; }
+        .btn{ padding:12px 24px; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; transition:all .3s; display:flex; align-items:center; gap:8px; }
+        .btn-primary{ background:var(--primary); color:white; }
+        .btn-primary:hover{ background:var(--primary-dark); transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+        .btn-secondary{ background:var(--light); color:var(--dark); border:1px solid var(--border); }
+        .results-section{ background:white; border-radius:16px; padding:32px; box-shadow:var(--shadow-lg); }
+        .results-header{ display:flex; justify-content:between; align-items:center; margin-bottom:20px; }
+        .results-count{ background:var(--primary); color:white; padding:4px 12px; border-radius:20px; font-size:14px; font-weight:600; }
+        .assessment-card{ background:var(--light); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; transition:all .3s; cursor:pointer; }
+        .assessment-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow); border-color:var(--primary); }
+        .assessment-header{ display:flex; justify-content:between; align-items:start; margin-bottom:12px; }
+        .assessment-name{ font-size:18px; font-weight:600; color:var(--dark); margin-bottom:4px; }
+        .assessment-url{ color:var(--primary); text-decoration:none; font-size:14px; word-break:break-all; }
+        .assessment-description{ color:var(--secondary); font-size:14px; margin-bottom:16px; line-height:1.5; }
+        .assessment-meta{ display:flex; gap:16px; flex-wrap:wrap; }
+        .meta-item{ display:flex; align-items:center; gap:6px; font-size:13px; color:var(--secondary); }
+        .meta-badge{ background:white; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:600; }
+        .badge-success{ background:#dcfce7; color:#166534; }
+        .badge-warning{ background:#fef3c7; color:#92400e; }
+        .test-types{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+        .test-type{ background:rgba(37,99,235,.1); color:var(--primary); padding:4px 8px; border-radius:6px; font-size:12px; font-weight:500; }
+        .sidebar{ background:white; border-radius:16px; padding:24px; box-shadow:var(--shadow-lg); position:sticky; top:20px; }
+        .features-list{ list-style:none; }
+        .feature-item{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+        .feature-item:last-child{ border-bottom:none; }
+        .feature-icon{ width:32px; height:32px; background:var(--light); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--primary); }
+        .feature-text{ flex:1; }
+        .feature-title{ font-weight:600; font-size:14px; margin-bottom:2px; }
+        .feature-desc{ font-size:12px; color:var(--secondary); }
+        .loading{ display:none; text-align:center; padding:40px; }
+        .spinner{ width:40px; height:40px; border:4px solid var(--border); border-left:4px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px; }
+        @keyframes spin{ 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        .loading-text{ color:var(--secondary); font-size:16px; }
+        .empty-state{ text-align:center; padding:40px 20px; color:var(--secondary); }
+        .empty-icon{ font-size:48px; margin-bottom:16px; color:var(--border); }
+        @media (max-width:768px){
+            .main-content{ grid-template-columns:1fr; }
+            .sidebar{ order:-1; }
+            .action-buttons{ flex-direction:column; }
+            .btn{ width:100%; justify-content:center; }
         }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .logo {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            /* -webkit-background-clip: text; */
-            -webkit-text-fill-color: transparent;
-        }
-
-        .tagline {
-            color: var(--secondary);
-            font-size: 16px;
-            margin-left: 52px;
-        }
-
-        /* Main Content */
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 30px;
-            align-items: start;
-        }
-
-        /* Query Section */
-        .query-section {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: var(--shadow-lg);
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title i {
-            color: var(--primary);
-        }
-
-        .query-input-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .query-input {
-            width: 100%;
-            min-height: 120px;
-            padding: 16px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            font-size: 16px;
-            resize: vertical;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .query-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .query-input::placeholder {
-            color: var(--secondary);
-        }
-
-        .char-count {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 12px;
-            color: var(--secondary);
-        }
-
-        .examples-section {
-            margin-bottom: 25px;
-        }
-
-        .examples-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .example-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .example-chip {
-            background: var(--light);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .example-chip:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn-secondary {
-            background: var(--light);
-            color: var(--dark);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: white;
-            border-color: var(--primary);
-        }
-
-        /* Results Section */
-        .results-section {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .results-count {
-            background: var(--primary);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .assessment-card {
-            background: var(--light);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .assessment-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-            border-color: var(--primary);
-        }
-
-        .assessment-header {
-            display: flex;
-            justify-content: between;
-            align-items: start;
-            margin-bottom: 12px;
-        }
-
-        .assessment-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-
-        .assessment-url {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 14px;
-            word-break: break-all;
-        }
-
-        .assessment-url:hover {
-            text-decoration: underline;
-        }
-
-        .assessment-description {
-            color: var(--secondary);
-            font-size: 14px;
-            margin-bottom: 16px;
-            line-height: 1.5;
-        }
-
-        .assessment-meta {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            color: var(--secondary);
-        }
-
-        .meta-badge {
-            background: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .test-types {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .test-type {
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--primary);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: var(--shadow-lg);
-            position: sticky;
-            top: 20px;
-        }
-
-        .features-list {
-            list-style: none;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .feature-item:last-child {
-            border-bottom: none;
-        }
-
-        .feature-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--light);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-        }
-
-        .feature-text {
-            flex: 1;
-        }
-
-        .feature-title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 2px;
-        }
-
-        .feature-desc {
-            font-size: 12px;
-            color: var(--secondary);
-        }
-
-        /* Loading State */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--border);
-            border-left: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: var(--secondary);
-            font-size: 16px;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--secondary);
-        }
-
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--border);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                order: -1;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 30px 0;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            margin-top: 50px;
-        }
+        .footer{ text-align:center; padding:30px 0; color:rgba(255,255,255,.8); font-size:14px; margin-top:50px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header class="header">
             <div class="logo-container">
                 <div class="logo">SHL</div>
@@ -479,25 +100,12 @@
             <div class="tagline">AI-powered talent assessment matching for optimal hiring decisions</div>
         </header>
 
-        <!-- Main Content -->
         <div class="main-content">
-            <!-- Left Column -->
             <div class="left-column">
-                <!-- Query Section -->
                 <section class="query-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-search"></i>
-                        Describe Your Hiring Needs
-                    </h2>
-                    
+                    <h2 class="section-title"><i class="fas fa-search"></i> Describe Your Hiring Needs</h2>
                     <div class="query-input-container">
-                        <textarea 
-                            id="queryInput" 
-                            class="query-input" 
-                            placeholder="Enter job description, role requirements, or specific skills needed... 
-Example: 'I need a Java developer with collaboration skills for 40 minutes assessment'"
-                            maxlength="1000"
-                        ></textarea>
+                        <textarea id="queryInput" class="query-input" placeholder="Enter job description, role requirements, or specific skills needed... Example: 'I need a Java developer with collaboration skills for 40 minutes assessment'" maxlength="1000"></textarea>
                         <div class="char-count"><span id="charCount">0</span>/1000</div>
                     </div>
 
@@ -512,24 +120,14 @@ Example: 'I need a Java developer with collaboration skills for 40 minutes asses
                     </div>
 
                     <div class="action-buttons">
-                        <button id="recommendBtn" class="btn btn-primary">
-                            <i class="fas fa-robot"></i>
-                            Get Recommendations
-                        </button>
-                        <button id="clearBtn" class="btn btn-secondary">
-                            <i class="fas fa-eraser"></i>
-                            Clear
-                        </button>
+                        <button id="recommendBtn" class="btn btn-primary"><i class="fas fa-robot"></i> Get Recommendations</button>
+                        <button id="clearBtn" class="btn btn-secondary"><i class="fas fa-eraser"></i> Clear</button>
                     </div>
                 </section>
 
-                <!-- Results Section -->
                 <section class="results-section">
                     <div class="results-header">
-                        <h2 class="section-title">
-                            <i class="fas fa-list-alt"></i>
-                            Recommended Assessments
-                        </h2>
+                        <h2 class="section-title"><i class="fas fa-list-alt"></i> Recommended Assessments</h2>
                         <div id="resultsCount" class="results-count">0 results</div>
                     </div>
 
@@ -539,77 +137,42 @@ Example: 'I need a Java developer with collaboration skills for 40 minutes asses
                     </div>
 
                     <div id="emptyState" class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-clipboard-list"></i>
-                        </div>
+                        <div class="empty-icon"><i class="fas fa-clipboard-list"></i></div>
                         <h3>No recommendations yet</h3>
                         <p>Enter your hiring requirements above to get personalized assessment recommendations.</p>
                     </div>
 
-                    <div id="resultsContainer" class="results-container">
-                        <!-- Results will be populated here by JavaScript -->
-                    </div>
+                    <div id="resultsContainer" class="results-container"></div>
                 </section>
             </div>
 
-            <!-- Right Column - Sidebar -->
             <div class="sidebar">
-                <h2 class="section-title">
-                    <i class="fas fa-star"></i>
-                    Why Choose Our Recommender
-                </h2>
-                
+                <h2 class="section-title"><i class="fas fa-star"></i> Why Choose Our Recommender</h2>
                 <ul class="features-list">
                     <li class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <div class="feature-text">
-                            <div class="feature-title">AI-Powered Matching</div>
-                            <div class="feature-desc">Advanced algorithms analyze your requirements</div>
-                        </div>
+                        <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                        <div class="feature-text"><div class="feature-title">AI-Powered Matching</div><div class="feature-desc">Advanced algorithms analyze your requirements</div></div>
                     </li>
                     <li class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-balance-scale"></i>
-                        </div>
-                        <div class="feature-text">
-                            <div class="feature-title">Balanced Recommendations</div>
-                            <div class="feature-desc">Mix of technical, behavioral, and cognitive tests</div>
-                        </div>
+                        <div class="feature-icon"><i class="fas fa-balance-scale"></i></div>
+                        <div class="feature-text"><div class="feature-title">Balanced Recommendations</div><div class="feature-desc">Mix of technical, behavioral, and cognitive tests</div></div>
                     </li>
                     <li class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="feature-text">
-                            <div class="feature-title">Duration Optimization</div>
-                            <div class="feature-desc">Respects your time constraints automatically</div>
-                        </div>
+                        <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                        <div class="feature-text"><div class="feature-title">Duration Optimization</div><div class="feature-desc">Respects your time constraints automatically</div></div>
                     </li>
                     <li class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-database"></i>
-                        </div>
-                        <div class="feature-text">
-                            <div class="feature-title">377+ Assessments</div>
-                            <div class="feature-desc">Comprehensive SHL product catalog coverage</div>
-                        </div>
+                        <div class="feature-icon"><i class="fas fa-database"></i></div>
+                        <div class="feature-text"><div class="feature-title">377+ Assessments</div><div class="feature-desc">Comprehensive SHL product catalog coverage</div></div>
                     </li>
                     <li class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="feature-text">
-                            <div class="feature-title">Proven Accuracy</div>
-                            <div class="feature-desc">Trained on expert-labeled assessment data</div>
-                        </div>
+                        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="feature-text"><div class="feature-title">Proven Accuracy</div><div class="feature-desc">Trained on expert-labeled assessment data</div></div>
                     </li>
                 </ul>
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="footer">
             <p>SHL Assessment Recommendation System | Powered by AI & Machine Learning</p>
             <p>© 2025 SHL Recommender. All rights reserved.</p>
@@ -617,7 +180,6 @@ Example: 'I need a Java developer with collaboration skills for 40 minutes asses
     </div>
 
     <script>
-        // --- Elements ---
         const queryInput = document.getElementById('queryInput');
         const charCount = document.getElementById('charCount');
         const recommendBtn = document.getElementById('recommendBtn');
@@ -628,13 +190,9 @@ Example: 'I need a Java developer with collaboration skills for 40 minutes asses
         const resultsCount = document.getElementById('resultsCount');
         const exampleChips = document.querySelectorAll('.example-chip');
 
-        // --- Config ---
-        const API_BASE_URL = 'http://localhost:8000';
+        const API_BASE_URL = window.location.origin;
 
-        // --- Handlers ---
-        queryInput.addEventListener('input', () => {
-            charCount.textContent = queryInput.value.length;
-        });
+        queryInput.addEventListener('input', () => { charCount.textContent = queryInput.value.length; });
 
         exampleChips.forEach(chip => {
             chip.addEventListener('click', () => {
@@ -651,74 +209,51 @@ Example: 'I need a Java developer with collaboration skills for 40 minutes asses
         });
 
         recommendBtn.addEventListener('click', getRecommendations);
+        queryInput.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 'Enter') getRecommendations(); });
 
-        queryInput.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') {
-                getRecommendations();
-            }
-        });
-
-        // --- Helpers ---
-        function showLoading() {
+        function showLoading(msg) {
             loading.style.display = 'block';
             emptyState.style.display = 'none';
             resultsContainer.innerHTML = '';
             resultsCount.textContent = '0 results';
+            if (msg) {
+                const txt = loading.querySelector('.loading-text');
+                if (txt) txt.textContent = msg;
+            }
         }
 
         function displayResults(assessments) {
             loading.style.display = 'none';
-            
             if (!assessments || assessments.length === 0) {
                 emptyState.style.display = 'block';
                 resultsCount.textContent = '0 results';
                 return;
             }
-
             emptyState.style.display = 'none';
             resultsCount.textContent = `${assessments.length} results`;
-
-            const resultsHTML = assessments.map((assessment, index) => `
+            const resultsHTML = assessments.map((assessment) => `
                 <div class="assessment-card" onclick="window.open('${assessment.url}', '_blank')">
                     <div class="assessment-header">
                         <div>
                             <div class="assessment-name">${assessment.name}</div>
-                            <a href="${assessment.url}" class="assessment-url" target="_blank" onclick="event.stopPropagation()">
-                                ${assessment.url}
-                            </a>
+                            <a href="${assessment.url}" class="assessment-url" target="_blank" onclick="event.stopPropagation()">${assessment.url}</a>
                         </div>
                     </div>
-                    <div class="assessment-description">
-                        ${assessment.description || 'No description available'}
-                    </div>
+                    <div class="assessment-description">${assessment.description || 'No description available'}</div>
                     <div class="assessment-meta">
-                        <div class="meta-item">
-                            <i class="fas fa-clock"></i>
-                            <span>${assessment.duration || 'N/A'} min</span>
+                        <div class="meta-item"><i class="fas fa-clock"></i><span>${assessment.duration || 'N/A'} min</span></div>
+                        <div class="meta-item"><i class="fas fa-laptop-house"></i>
+                            <span class="meta-badge ${assessment.remote_support === 'Yes' ? 'badge-success' : 'badge-warning'}">${assessment.remote_support} Remote</span>
                         </div>
-                        <div class="meta-item">
-                            <i class="fas fa-laptop-house"></i>
-                            <span class="meta-badge ${assessment.remote_support === 'Yes' ? 'badge-success' : 'badge-warning'}">
-                                ${assessment.remote_support} Remote
-                            </span>
-                        </div>
-                        <div class="meta-item">
-                            <i class="fas fa-robot"></i>
-                            <span class="meta-badge ${assessment.adaptive_support === 'Yes' ? 'badge-success' : 'badge-warning'}">
-                                ${assessment.adaptive_support} Adaptive
-                            </span>
+                        <div class="meta-item"><i class="fas fa-robot"></i>
+                            <span class="meta-badge ${assessment.adaptive_support === 'Yes' ? 'badge-success' : 'badge-warning'}">${assessment.adaptive_support} Adaptive</span>
                         </div>
                     </div>
                     ${assessment.test_type && assessment.test_type.length > 0 ? `
-                        <div class="test-types">
-                            ${assessment.test_type.map(type => `
-                                <span class="test-type">${type}</span>
-                            `).join('')}
-                        </div>
+                        <div class="test-types">${assessment.test_type.map(type => `<span class="test-type">${type}</span>`).join('')}</div>
                     ` : ''}
                 </div>
             `).join('');
-
             resultsContainer.innerHTML = resultsHTML;
         }
 
@@ -731,10 +266,7 @@ Example: 'I need a Java developer with collaboration skills for 40 minutes asses
                 </div>
                 <h3>Something went wrong</h3>
                 <p>${message}</p>
-                <button class="btn btn-primary" onclick="getRecommendations()" style="margin-top: 16px;">
-                    <i class="fas fa-redo"></i>
-                    Try Again
-                </button>
+                <button class="btn btn-primary" onclick="getRecommendations()" style="margin-top:16px;"><i class="fas fa-redo"></i> Try Again</button>
             `;
         }
 
@@ -745,47 +277,65 @@ Example: 'I need a Java developer with collaboration skills for 40 minutes asses
             resultsCount.textContent = '0 results';
         }
 
-        // --- Core: fetch recommendations ---
-        async function getRecommendations() {
-            const query = queryInput.value.trim();
-            
-            if (!query) {
-                alert('Please enter a job description or requirements');
-                return;
-            }
-
-            if (query.length < 10) {
-                alert('Please provide more details for better recommendations');
-                return;
-            }
-
-            showLoading();
-            
+        async function checkHealth(timeoutMs = 3000) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeoutMs);
             try {
-                const response = await fetch(`${API_BASE_URL}/recommend`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: query
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                displayResults(data.recommended_assessments);
-                
-            } catch (error) {
-                console.error('Error fetching recommendations:', error);
-                displayError('Failed to get recommendations. Please try again.');
+                const res = await fetch(`${API_BASE_URL}/health`, { signal: controller.signal });
+                clearTimeout(id);
+                if (!res.ok) return null;
+                return await res.json();
+            } catch (err) {
+                return null;
             }
         }
 
-        // --- Init ---
+        async function getRecommendations() {
+            const query = queryInput.value.trim();
+            if (!query) { alert('Please enter a job description or requirements'); return; }
+            if (query.length < 10) { alert('Please provide more details for better recommendations'); return; }
+
+            showLoading('Checking service health...');
+            const health = await checkHealth();
+
+            if (!health) {
+                displayError('Could not reach the recommendation service. Ensure the backend is running and accessible.');
+                return;
+            }
+
+            if (health.status && (health.status === 'initializing' || health.status === 'uninitialized')) {
+                loading.style.display = 'none';
+                emptyState.style.display = 'block';
+                emptyState.innerHTML = `
+                    <div class="empty-icon"><i class="fas fa-hourglass-half"></i></div>
+                    <h3>Service is starting</h3>
+                    <p>The recommendation engine is initializing on the server. Please wait a minute and try again.</p>
+                    <button class="btn btn-primary" onclick="getRecommendations()" style="margin-top:16px;"><i class="fas fa-redo"></i> Retry</button>
+                `;
+                return;
+            }
+
+            showLoading('Analyzing your requirements and finding the best assessments...');
+            try {
+                const response = await fetch(`${API_BASE_URL}/recommend`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                if (!response.ok) {
+                    let text = await response.text().catch(() => '');
+                    throw new Error(`HTTP ${response.status} ${text}`);
+                }
+
+                const data = await response.json();
+                displayResults(data.recommended_assessments || []);
+            } catch (error) {
+                console.error('Error fetching recommendations:', error);
+                displayError('Failed to get recommendations. Please try again later.');
+            }
+        }
+
         charCount.textContent = '0';
     </script>
 </body>
