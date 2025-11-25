@@ -1,4 +1,4 @@
-
+openpyxl
 fastapi==0.121.3
 uvicorn[standard]==0.22.0
 
