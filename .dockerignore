@@ -1,0 +1,62 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.env
+.env.*
+
+# Git & Editors
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Build folders
+node_modules/
+dist/
+build/
+
+# OS trash
+.DS_Store
+Thumbs.db
+
+# Logs / DBs
+logs/
+*.log
+*.sqlite3
+*.db
+
+# HuggingFace and other large caches
+.cache/
+.huggingface/
+transformers_cache/
+sentence_transformers/
+
+# Skip raw data if unnecessary
+data/
+punkt_tab/
+
+# Ignore large raw catalogs / CSVs
+catalog_clean_errors.json
+submission.csv
+create_submission_csv.py
+scrape_shl_assessments.py
+
+# Allow runtime files
+!server.py
+!build_embeddings.py
+!catalog_clean.json
+!index.html
+!improved_query_engine.py
+!requirements.txt
+!Dockerfile
+!docker-compose.yml
+!runtime.txt
+!frontend.html
+!static/
+!vector_store/
